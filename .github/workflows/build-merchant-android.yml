@@ -24,7 +24,12 @@ jobs:
             dispatch-payload.json merchant-build.json
 
       - name: Apply merchant build
-        run: dart run tool/apply_merchant_build.dart merchant-build.json
+        run: |
+          dart run tool/apply_merchant_build.dart merchant-build.json
+          echo "TENANT_SLUG=$(jq -r '.tenantSlug' merchant-build.json)" >> "$GITHUB_ENV"
+          echo "APP_NAME=$(jq -r '.appName' merchant-build.json)" >> "$GITHUB_ENV"
+          echo "APP_VERSION=$(jq -r '.version' merchant-build.json)" >> "$GITHUB_ENV"
+          echo "BUILD_NUMBER=$(jq -r '.buildNumber' merchant-build.json)" >> "$GITHUB_ENV"
 
       - name: Test
         continue-on-error: true
@@ -32,16 +37,14 @@ jobs:
 
       - name: Build APK
         run: |
-          VERSION=$(jq -r '.version' merchant-build.json)
-          BUILD_NUMBER=$(jq -r '.buildNumber' merchant-build.json)
           flutter build apk --release \
-            --build-name="$VERSION" \
+            --build-name="$APP_VERSION" \
             --build-number="$BUILD_NUMBER"
 
       - name: Upload APK to GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.event.client_payload.tenant_slug }}-android-apk
+          name: ${{ env.TENANT_SLUG }}-android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Upload APK to GoFile
@@ -63,10 +66,12 @@ jobs:
           message: |
             تم بناء تطبيق أندرويد جديد بنجاح.
 
-            اسم التطبيق: ${{ github.event.client_payload.app_name }}
-            المعرّف (Slug): ${{ github.event.client_payload.tenant_slug }}
-            رقم البناء: #${{ github.event.client_payload.build_number || 1 }}
-            الإصدار: ${{ github.event.client_payload.version || '1.0.0' }}
+            اسم التطبيق: ${{ env.APP_NAME }}
+            المعرّف (Slug): ${{ env.TENANT_SLUG }}
+            رقم البناء: #${{ env.BUILD_NUMBER }}
+            الإصدار: ${{ env.APP_VERSION }}
 
             رابط تحميل الـ APK:
             ${{ env.DOWNLOAD_URL }}
+
+            ملاحظة: للتثبيت الموثوق، حمّلي الـ APK من GitHub Actions Artifacts أولاً.

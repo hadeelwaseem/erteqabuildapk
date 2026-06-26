@@ -86,6 +86,18 @@ void main() {
       final payload = unwrapDispatchPayload(_validPayload);
       expect(payload['tenant_slug'], 'anasgoldenmer');
     });
+
+    test('unwraps app_data JSON string inside client_payload', () {
+      final payload = unwrapDispatchPayload(<String, dynamic>{
+        'app_data':
+            '{"app_name":"Anas Store","bundle_id":"com.sooq.merchant.mobile",'
+            '"api_base_url":"https://example.com","tenant_id":"id",'
+            '"tenant_slug":"slug","config_mode":"local","variant_id":"mobile_production_v2"}',
+      });
+
+      expect(payload['app_name'], 'Anas Store');
+      expect(payload['bundle_id'], 'com.sooq.merchant.mobile');
+    });
   });
 }
 

@@ -2,6 +2,8 @@
 /// into a merchant build manifest (camelCase) for [apply_merchant_build.dart].
 library;
 
+import 'dart:convert';
+
 const merchantDispatchRequiredKeys = <String>[
   'app_name',
   'bundle_id',
@@ -87,16 +89,34 @@ Map<String, dynamic> merchantManifestFromDispatch(
   };
 }
 
-/// Unwraps a full repository_dispatch body or raw `client_payload`.
+/// Unwraps a full repository_dispatch body, raw `client_payload`, or
+/// `client_payload.app_data` (JSON string from some builders).
 Map<String, dynamic> unwrapDispatchPayload(Map<String, dynamic> input) {
+  Map<String, dynamic> current = input;
+
   final nested = input['client_payload'];
   if (nested is Map<String, dynamic>) {
-    return nested;
+    current = nested;
+  } else if (nested is Map) {
+    current = Map<String, dynamic>.from(nested);
   }
-  if (nested is Map) {
-    return Map<String, dynamic>.from(nested);
+
+  return _unwrapAppDataIfPresent(current);
+}
+
+Map<String, dynamic> _unwrapAppDataIfPresent(Map<String, dynamic> payload) {
+  final appData = payload['app_data'];
+  if (appData == null) return payload;
+
+  if (appData is String && appData.trim().isNotEmpty) {
+    final decoded = jsonDecode(appData);
+    if (decoded is Map<String, dynamic>) return decoded;
+    if (decoded is Map) return Map<String, dynamic>.from(decoded);
   }
-  return input;
+  if (appData is Map<String, dynamic>) return appData;
+  if (appData is Map) return Map<String, dynamic>.from(appData);
+
+  return payload;
 }
 
 String _requiredString(Map<String, dynamic> json, String key) {
