@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../config/component_config.dart';
@@ -57,11 +56,13 @@ class TextFormFieldRenderer implements ComponentRenderer {
       properties['keyboardType'] as String?,
     );
     final isPhoneKeyboard = keyboardType == TextInputType.phone;
-    final textDirection = PropertyParsers.parseTextDirection(
+    final textDirection =
+        PropertyParsers.parseTextDirection(
           properties['textDirection'] as String?,
         ) ??
         (isPhoneKeyboard ? TextDirection.ltr : null);
-    final textAlign = PropertyParsers.parseTextAlign(explicitTextAlign) ??
+    final textAlign =
+        PropertyParsers.parseTextAlign(explicitTextAlign) ??
         (textDirection == TextDirection.ltr ? TextAlign.left : null);
 
     final inputFormatters = PropertyParsers.parseInputFormatters(
@@ -125,24 +126,25 @@ class TextFormFieldRenderer implements ComponentRenderer {
       validationMessage: validationMessage,
     );
 
-    final contentPadding = PropertyParsers.parseEdgeInsets(properties['padding']);
+    final contentPadding = PropertyParsers.parseEdgeInsets(
+      properties['padding'],
+    );
 
     final controllerKey = controllerId ?? fieldId;
     final formState = _formStateFrom(dataContext);
-    assert(
-      () {
-        if (formState == null) {
-          debugPrint(
-            '[TextFormFieldRenderer] FormStateStore missing in dataContext '
-            'for field "$fieldId". Wire VariantScreen or parent form.',
-          );
-        }
-        return formState != null;
-      }(),
-    );
+    assert(() {
+      if (formState == null) {
+        debugPrint(
+          '[TextFormFieldRenderer] FormStateStore missing in dataContext '
+          'for field "$fieldId". Wire VariantScreen or parent form.',
+        );
+      }
+      return formState != null;
+    }());
 
-    final effectiveKey =
-        controllerKey.isEmpty ? 'field_${config.hashCode}' : controllerKey;
+    final effectiveKey = controllerKey.isEmpty
+        ? 'field_${config.hashCode}'
+        : controllerKey;
     final TextEditingController controller;
     if (formState != null) {
       controller = formState.controllerFor(
@@ -242,10 +244,7 @@ class TextFormFieldRenderer implements ComponentRenderer {
         final radius =
             borderRadius ?? BorderRadius.circular(theme?.radiusMd ?? 12);
         result = DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            boxShadow: [shadow],
-          ),
+          decoration: BoxDecoration(borderRadius: radius, boxShadow: [shadow]),
           child: result,
         );
       }
@@ -270,9 +269,8 @@ class TextFormFieldRenderer implements ComponentRenderer {
     if (clearable) {
       return ListenableBuilder(
         listenable: controller,
-        builder: (context, _) => Builder(
-          builder: (context) => buildField(context),
-        ),
+        builder: (context, _) =>
+            Builder(builder: (context) => buildField(context)),
       );
     }
 
@@ -296,11 +294,11 @@ class TextFormFieldRenderer implements ComponentRenderer {
   }) {
     final prefixIcon = _tapTargetIcon(prefixIconName);
 
-    final radius =
-        borderRadius ?? BorderRadius.circular(theme?.radiusMd ?? 12);
+    final radius = borderRadius ?? BorderRadius.circular(theme?.radiusMd ?? 12);
     final fill = fillColor ?? theme?.surfaceColor ?? const Color(0xFFF8FAFC);
     final defaultPadding =
-        contentPadding ?? const EdgeInsets.symmetric(horizontal: 12, vertical: 14);
+        contentPadding ??
+        const EdgeInsets.symmetric(horizontal: 12, vertical: 14);
 
     final borderSide = border != null
         ? BorderSide(color: border.top.color, width: border.top.width)
@@ -362,9 +360,7 @@ class TextFormFieldRenderer implements ComponentRenderer {
     return SizedBox(
       width: _minTapTarget,
       height: _minTapTarget,
-      child: Center(
-        child: Icon(PropertyParsers.parseIconData(iconName)),
-      ),
+      child: Center(child: Icon(PropertyParsers.parseIconData(iconName))),
     );
   }
 
@@ -485,16 +481,14 @@ class TextFormFieldRenderer implements ComponentRenderer {
         return validationMessage ?? 'أدخل رقم جوال صالحاً';
       }
       if (validatePassword && !_isPassword(text)) {
-        return validationMessage ??
-            'كلمة المرور 8 أحرف على الأقل وتتضمن رقماً';
+        return validationMessage ?? 'كلمة المرور 8 أحرف على الأقل وتتضمن رقماً';
       }
       if (validateMinLength != null && text.length < validateMinLength) {
         return validationMessage ??
             'يجب أن يكون $validateMinLength أحرف على الأقل';
       }
       if (validateMaxLength != null && text.length > validateMaxLength) {
-        return validationMessage ??
-            'يجب ألا يتجاوز $validateMaxLength حرفاً';
+        return validationMessage ?? 'يجب ألا يتجاوز $validateMaxLength حرفاً';
       }
       if (validatePattern != null && validatePattern.isNotEmpty) {
         final regex = RegExp(validatePattern);

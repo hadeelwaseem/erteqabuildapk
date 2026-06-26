@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sooq_merchant/engine/actions/action_dispatcher.dart';
 
 void main() {
   test('product detail route prefers item slug over productId uuid', () {
@@ -11,21 +10,20 @@ void main() {
       },
     };
 
-    final resolved = route.replaceAllMapped(
-      RegExp(r':([A-Za-z0-9_]+)'),
-      (match) {
-        final key = match.group(1) ?? '';
-        // Mirror EngineActionDispatcher._lookupRouteValue via testing helper
-        final item = dataContext['item'] as Map<String, dynamic>;
-        if (key == 'productId') {
-          final slug = item['slug'];
-          if (slug != null && slug.toString().trim().isNotEmpty) {
-            return slug.toString().trim();
-          }
+    final resolved = route.replaceAllMapped(RegExp(r':([A-Za-z0-9_]+)'), (
+      match,
+    ) {
+      final key = match.group(1) ?? '';
+      // Mirror EngineActionDispatcher._lookupRouteValue via testing helper
+      final item = dataContext['item'] as Map<String, dynamic>;
+      if (key == 'productId') {
+        final slug = item['slug'];
+        if (slug != null && slug.toString().trim().isNotEmpty) {
+          return slug.toString().trim();
         }
-        return item[key]?.toString() ?? match.group(0) ?? '';
-      },
-    );
+      }
+      return item[key]?.toString() ?? match.group(0) ?? '';
+    });
 
     expect(resolved, '/product/details/simple-product-test');
   });

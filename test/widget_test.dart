@@ -8,7 +8,6 @@ import 'package:sooq_merchant/core/cubits/token_cubit/token_cubit.dart';
 import 'package:sooq_merchant/core/network/network_config.dart';
 import 'package:sooq_merchant/core/utils/service_locator.dart';
 import 'package:sooq_merchant/app/sooq_app.dart';
-import 'package:sooq_merchant/core/cubits/shared_preferences_cubit/shared_preferences_cubit.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

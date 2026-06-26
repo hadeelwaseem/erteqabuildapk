@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sooq_merchant/config/models/mobile_theme_config.dart';
 import 'package:sooq_merchant/engine/skeleton/skeleton_effect_factory.dart';
@@ -23,7 +22,8 @@ void main() {
     final theme = EngineTheme.fromConfig(MobileThemeConfig.defaults());
     final container = SkeletonEffectFactory.containersColor(theme);
     final delta =
-        (container.computeLuminance() - theme.backgroundColor.computeLuminance())
+        (container.computeLuminance() -
+                theme.backgroundColor.computeLuminance())
             .abs();
     expect(delta, greaterThan(0.02));
   });

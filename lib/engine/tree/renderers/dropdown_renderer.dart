@@ -41,10 +41,9 @@ class DropdownRenderer implements ComponentRenderer {
     final properties = config.properties;
     final fieldId = properties['id'] as String? ?? '';
     final controllerId = properties['controllerId'] as String?;
-    final effectiveKey =
-        (controllerId ?? fieldId).isEmpty
-            ? 'dropdown_${config.hashCode}'
-            : (controllerId ?? fieldId);
+    final effectiveKey = (controllerId ?? fieldId).isEmpty
+        ? 'dropdown_${config.hashCode}'
+        : (controllerId ?? fieldId);
 
     final items = _resolveItems(properties, dataContext);
     final theme = EngineTheme.fromDataContext(dataContext);
@@ -70,7 +69,9 @@ class DropdownRenderer implements ComponentRenderer {
 
     final margin = PropertyParsers.parseEdgeInsets(properties['margin']);
     final width = PropertyParsers.parseDouble(properties['width']);
-    final contentPadding = PropertyParsers.parseEdgeInsets(properties['padding']);
+    final contentPadding = PropertyParsers.parseEdgeInsets(
+      properties['padding'],
+    );
     final color = PropertyParsers.parseColor(properties['color'] as String?);
     final borderRadius = PropertyParsers.parseBorderRadius(
       properties['borderRadius'],
@@ -79,11 +80,9 @@ class DropdownRenderer implements ComponentRenderer {
 
     final tapAction = properties['tap'];
     final tapMap = tapAction is Map<String, dynamic> ? tapAction : null;
-    final onChangedAction =
-        properties['onChanged'] as Map<String, dynamic>?;
+    final onChangedAction = properties['onChanged'] as Map<String, dynamic>?;
 
-    final semanticsLabel =
-        properties['semanticsLabel'] as String? ?? label;
+    final semanticsLabel = properties['semanticsLabel'] as String? ?? label;
 
     final initialValue = _resolveSelectedValue(
       properties: properties,
@@ -395,11 +394,7 @@ class _EngineDropdownFieldState extends State<_EngineDropdownField> {
         DropdownMenuItem<String>(
           value: item.value,
           enabled: !item.disabled,
-          child: Text(
-            item.label,
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-          ),
+          child: Text(item.label, overflow: TextOverflow.ellipsis, maxLines: 1),
         ),
     ];
 
@@ -427,8 +422,7 @@ class _EngineDropdownFieldState extends State<_EngineDropdownField> {
     final compact = _isCompactFilter();
     final inForm = context.findAncestorWidgetOfExactType<Form>() != null;
     final useFormField =
-        !compact &&
-        (validator != null || inForm || _hasDecoratedLabel());
+        !compact && (validator != null || inForm || _hasDecoratedLabel());
 
     Widget field;
     if (widget.readOnly) {
@@ -447,7 +441,8 @@ class _EngineDropdownFieldState extends State<_EngineDropdownField> {
       );
     } else if (useFormField) {
       field = DropdownButtonFormField<String>(
-        value: _selectedValue != null && _valueInItems(_selectedValue!, items)
+        initialValue:
+            _selectedValue != null && _valueInItems(_selectedValue!, items)
             ? _selectedValue
             : null,
         items: menuItems,
@@ -467,8 +462,8 @@ class _EngineDropdownFieldState extends State<_EngineDropdownField> {
       field = IntrinsicWidth(
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
-            value: _selectedValue != null &&
-                    _valueInItems(_selectedValue!, items)
+            value:
+                _selectedValue != null && _valueInItems(_selectedValue!, items)
                 ? _selectedValue
                 : null,
             items: menuItems,
@@ -486,8 +481,8 @@ class _EngineDropdownFieldState extends State<_EngineDropdownField> {
         isEmpty: _selectedValue == null,
         child: DropdownButtonHideUnderline(
           child: DropdownButton<String>(
-            value: _selectedValue != null &&
-                    _valueInItems(_selectedValue!, items)
+            value:
+                _selectedValue != null && _valueInItems(_selectedValue!, items)
                 ? _selectedValue
                 : null,
             items: menuItems,
@@ -614,8 +609,7 @@ class _EngineDropdownFieldState extends State<_EngineDropdownField> {
     required Border? border,
     required EdgeInsets? contentPadding,
   }) {
-    final radius =
-        borderRadius ?? BorderRadius.circular(theme?.radiusMd ?? 12);
+    final radius = borderRadius ?? BorderRadius.circular(theme?.radiusMd ?? 12);
     final fill = fillColor ?? theme?.surfaceColor ?? const Color(0xFFF8FAFC);
     final defaultPadding =
         contentPadding ??
@@ -623,9 +617,7 @@ class _EngineDropdownFieldState extends State<_EngineDropdownField> {
 
     final borderSide = border != null
         ? BorderSide(color: border.top.color, width: border.top.width)
-        : BorderSide(
-            color: theme?.inputBorderColor ?? const Color(0xFFE2E8F0),
-          );
+        : BorderSide(color: theme?.inputBorderColor ?? const Color(0xFFE2E8F0));
 
     final enabledOutline = OutlineInputBorder(
       borderRadius: radius,

@@ -38,7 +38,7 @@ ComponentConfig _gridConfig({
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Widget _buildChild(
+  Widget buildChild(
     ComponentConfig child,
     Map<String, dynamic> dataContext,
   ) {
@@ -65,7 +65,7 @@ void main() {
                 'data': {'requestKey': _requestKey, 'size': 6},
               },
             ),
-            buildChild: (c) => _buildChild(c, dataContext),
+            buildChild: (c) => buildChild(c, dataContext),
             dataContext: dataContext,
           ),
         ),
@@ -95,7 +95,7 @@ void main() {
         home: Scaffold(
           body: renderer.render(
             _gridConfig(extraProps: {'errorMessage': arabicError}),
-            buildChild: (c) => _buildChild(c, dataContext),
+            buildChild: (c) => buildChild(c, dataContext),
             dataContext: dataContext,
           ),
         ),
@@ -124,7 +124,7 @@ void main() {
         home: Scaffold(
           body: renderer.render(
             _gridConfig(extraProps: {'emptyMessage': arabicEmpty}),
-            buildChild: (c) => _buildChild(c, dataContext),
+            buildChild: (c) => buildChild(c, dataContext),
             dataContext: dataContext,
           ),
         ),
@@ -152,7 +152,7 @@ void main() {
         home: Scaffold(
           body: renderer.render(
             _gridConfig(),
-            buildChild: (c) => _buildChild(c, dataContext),
+            buildChild: (c) => buildChild(c, dataContext),
             dataContext: dataContext,
           ),
         ),
@@ -245,7 +245,7 @@ void main() {
           home: Scaffold(
             body: renderer.render(
               config,
-              buildChild: (c) => _buildChild(c, rendererDataContext()),
+              buildChild: (c) => buildChild(c, rendererDataContext()),
               dataContext: rendererDataContext(),
             ),
           ),

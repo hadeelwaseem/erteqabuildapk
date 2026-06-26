@@ -82,7 +82,7 @@ void main() {
           },
         },
         fallbackRequestUrl: '/api/v1/public/products?page=0&size=20',
-        sourceData: const {},
+        sourceData: {},
       );
 
       final browse = EngineRequestMapper.buildRuntimeRequest(

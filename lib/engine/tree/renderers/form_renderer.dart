@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../../config/component_config.dart';
@@ -13,7 +12,8 @@ class FormRenderer implements ComponentRenderer {
     required ComponentWidgetBuilder buildChild,
     Map<String, dynamic>? dataContext,
   }) {
-    final formId = config.properties['formId'] as String? ??
+    final formId =
+        config.properties['formId'] as String? ??
         config.properties['id'] as String? ??
         '';
     final autovalidateMode = _parseAutovalidateMode(
@@ -21,28 +21,22 @@ class FormRenderer implements ComponentRenderer {
     );
 
     final formState = _formStateFrom(dataContext);
-    assert(
-      () {
-        if (formState == null) {
-          debugPrint(
-            '[FormRenderer] FormStateStore missing in dataContext '
-            'for form "$formId". Wire VariantScreen.',
-          );
-        }
-        return formState != null;
-      }(),
-    );
+    assert(() {
+      if (formState == null) {
+        debugPrint(
+          '[FormRenderer] FormStateStore missing in dataContext '
+          'for form "$formId". Wire VariantScreen.',
+        );
+      }
+      return formState != null;
+    }());
 
     final child = _resolveChild(config, buildChild, dataContext);
     if (child == null) {
-      assert(
-        () {
-          debugPrint(
-            '[FormRenderer] form "$formId" has no child/children',
-          );
-          return false;
-        }(),
-      );
+      assert(() {
+        debugPrint('[FormRenderer] form "$formId" has no child/children');
+        return false;
+      }());
       return const SizedBox.shrink();
     }
 
@@ -51,11 +45,7 @@ class FormRenderer implements ComponentRenderer {
     }
 
     final formKey = formState.formKeyFor(formId);
-    return Form(
-      key: formKey,
-      autovalidateMode: autovalidateMode,
-      child: child,
-    );
+    return Form(key: formKey, autovalidateMode: autovalidateMode, child: child);
   }
 
   AutovalidateMode _parseAutovalidateMode(String? raw) {

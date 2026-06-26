@@ -5,7 +5,6 @@ import 'package:sooq_merchant/features/commerce/cart/data/repos/cart_repo.dart';
 import 'package:sooq_merchant/features/commerce/cart/presentation/manager/cart_cubit/cart_cubit.dart';
 import 'package:sooq_merchant/features/commerce/cart/presentation/manager/cart_cubit/cart_state.dart';
 import 'package:sooq_merchant/features/commerce/data/models/cart.dart';
-import 'package:sooq_merchant/features/commerce/data/models/cart_line.dart';
 
 class _MemoryCartRepo implements CartRepo {
   Cart _cart = const Cart();

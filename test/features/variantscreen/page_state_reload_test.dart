@@ -18,7 +18,7 @@ void main() {
         itemField: 'slug',
         pageStateKey: 'selectedCategorySlug',
       ),
-      sourceData: const {},
+      sourceData: {},
     );
 
     expect(request.primeFromRequest?.sourceRequestKey, 'category-tree');
@@ -41,11 +41,10 @@ void main() {
         },
       },
       deferInitialDispatch: true,
-      sourceData: const {},
+      sourceData: {},
     );
 
-    final store = PageStateStore()
-      ..update({'selectedCategorySlug': 'shoes'});
+    final store = PageStateStore()..update({'selectedCategorySlug': 'shoes'});
 
     final runtime = EngineRequestMapper.buildRuntimeRequest(
       base,

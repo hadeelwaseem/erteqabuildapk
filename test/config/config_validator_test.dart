@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sooq_merchant/config/bootstrap_config.dart';
@@ -47,10 +44,7 @@ void main() {
   };
 
   test('valid render JSON passes validation', () {
-    final result = ConfigValidator.validateMap(
-      bootstrap,
-      minimalRenderJson(),
-    );
+    final result = ConfigValidator.validateMap(bootstrap, minimalRenderJson());
 
     expect(result.valid, isTrue);
     expect(result.renderJson, isNotNull);
@@ -79,12 +73,7 @@ void main() {
     final result = ConfigValidator.validateMap(bootstrap, {
       'id': 'legacy-page',
       'pageName': 'Legacy',
-      'root': {
-        'id': 'root',
-        'type': 'scaffold',
-        'props': {},
-        'children': [],
-      },
+      'root': {'id': 'root', 'type': 'scaffold', 'props': {}, 'children': []},
     });
 
     expect(result.valid, isTrue);
@@ -94,11 +83,7 @@ void main() {
   test('empty pages with valid nav passes validation', () {
     final result = ConfigValidator.validateMap(bootstrap, {
       'schemaVersion': '1.0',
-      'navigation': {
-        'type': 'tabs',
-        'initialRoute': '/',
-        'tabs': [],
-      },
+      'navigation': {'type': 'tabs', 'initialRoute': '/', 'tabs': []},
       'pages': [],
     });
 

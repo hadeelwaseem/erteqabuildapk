@@ -3,16 +3,11 @@ import '../tree/parsers/data_context_path.dart';
 
 /// Resolves JSON action values: plain strings or `{ source, field }` maps.
 class ActionValueResolver {
-  ActionValueResolver({
-    FormStateStore? formState,
-  }) : _formState = formState;
+  ActionValueResolver({FormStateStore? formState}) : _formState = formState;
 
   final FormStateStore? _formState;
 
-  String? resolveString(
-    dynamic spec, {
-    Map<String, dynamic>? dataContext,
-  }) {
+  String? resolveString(dynamic spec, {Map<String, dynamic>? dataContext}) {
     if (spec == null) return null;
     if (spec is String) {
       final trimmed = spec.trim();
@@ -25,7 +20,7 @@ class ActionValueResolver {
     switch (source) {
       case 'form':
         if (field != null && _formState != null) {
-          final value = _formState!.valueFor(field);
+          final value = _formState.valueFor(field);
           return value?.toString().trim();
         }
         return null;

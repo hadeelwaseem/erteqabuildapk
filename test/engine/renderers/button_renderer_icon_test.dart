@@ -9,7 +9,9 @@ import 'renderer_test_utils.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('icon renders Row with label and Icon trailing by default', (tester) async {
+  testWidgets('icon renders Row with label and Icon trailing by default', (
+    tester,
+  ) async {
     final renderer = ButtonRenderer();
     final config = ComponentConfig(
       type: GenericComponentType.button,
@@ -64,18 +66,14 @@ void main() {
     );
 
     final row = tester.widget<Row>(find.byType(Row));
-    expect(row.children?.first, isA<Icon>());
+    expect(row.children.first, isA<Icon>());
   });
 
   testWidgets('without icon still renders plain Text child', (tester) async {
     final renderer = ButtonRenderer();
     final config = ComponentConfig(
       type: GenericComponentType.button,
-      properties: {
-        'label': 'Go',
-        'variant': 'elevated',
-        'onTap': () {},
-      },
+      properties: {'label': 'Go', 'variant': 'elevated', 'onTap': () {}},
     );
 
     await tester.pumpWidget(

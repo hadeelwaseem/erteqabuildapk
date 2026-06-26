@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 
 import '../engine/config_pipeline_result.dart';
 import 'bootstrap_config.dart';
@@ -28,13 +27,7 @@ class ConfigBackgroundSync {
       return;
     }
 
-    unawaited(
-      sync(
-        pipelineResult.bootstrap,
-        fetcher: fetcher,
-        cache: cache,
-      ),
-    );
+    unawaited(sync(pipelineResult.bootstrap, fetcher: fetcher, cache: cache));
   }
 
   @visibleForTesting

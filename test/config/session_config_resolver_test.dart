@@ -7,7 +7,6 @@ import 'package:sooq_merchant/config/bootstrap_config.dart';
 import 'package:sooq_merchant/config/config_cache.dart';
 import 'package:sooq_merchant/config/config_mode.dart';
 import 'package:sooq_merchant/config/remote_config_fetcher.dart';
-import 'package:sooq_merchant/config/remote_config_url.dart';
 import 'package:sooq_merchant/engine/config_pipeline_result.dart';
 import 'package:sooq_merchant/config/session_config_resolver.dart';
 
@@ -36,9 +35,7 @@ void main() {
     }
   });
 
-  ConfigCache cache() => ConfigCache(
-    directoryProvider: () async => tempDir,
-  );
+  ConfigCache cache() => ConfigCache(directoryProvider: () async => tempDir);
 
   Map<String, dynamic> validRenderJson() => {
     'schemaVersion': '1.0',
@@ -67,7 +64,10 @@ void main() {
 
   String validRawJson() => jsonEncode(validRenderJson());
 
-  RemoteConfigFetcher fetcherReturning(String? body, {bool failOnRequest = false}) {
+  RemoteConfigFetcher fetcherReturning(
+    String? body, {
+    bool failOnRequest = false,
+  }) {
     final dio = Dio();
     dio.interceptors.add(
       InterceptorsWrapper(
@@ -85,11 +85,7 @@ void main() {
             return;
           }
           handler.resolve(
-            Response(
-              requestOptions: options,
-              statusCode: 200,
-              data: body,
-            ),
+            Response(requestOptions: options, statusCode: 200, data: body),
           );
         },
       ),
@@ -100,7 +96,8 @@ void main() {
   SessionConfigResolver resolver({
     ConfigCache? cacheOverride,
     RemoteConfigFetcher? fetcher,
-    Future<Map<String, dynamic>> Function(BootstrapConfig bootstrap)? assetLoader,
+    Future<Map<String, dynamic>> Function(BootstrapConfig bootstrap)?
+    assetLoader,
   }) {
     return SessionConfigResolver(
       cache: cacheOverride ?? cache(),

@@ -35,12 +35,15 @@ void main() {
     );
   });
 
-  test('relative path uses kBaseUrlAsset when NetworkConfig is not registered', () {
-    expect(
-      resolveRemoteImageUrl('/uploads/foo.png'),
-      '${kBaseUrlAsset}/uploads/foo.png',
-    );
-  });
+  test(
+    'relative path uses kBaseUrlAsset when NetworkConfig is not registered',
+    () {
+      expect(
+        resolveRemoteImageUrl('/uploads/foo.png'),
+        '$kBaseUrlAsset/uploads/foo.png',
+      );
+    },
+  );
 
   test('httpHeadersForImageUrl is null for third-party hosts', () {
     expect(
@@ -63,30 +66,35 @@ void main() {
     );
   });
 
-  test('fullSizeFallbackForGeneratedThumbnail strips _150/_300/_600 png suffix', () {
-    const base =
-        'https://cdn.example.com/media/2026/06/photo-id';
-    expect(
-      fullSizeFallbackForGeneratedThumbnail('${base}_150.png'),
-      '$base.jpg',
-    );
-    expect(
-      fullSizeFallbackForGeneratedThumbnail('${base}_300.png'),
-      '$base.jpg',
-    );
-    expect(
-      fullSizeFallbackForGeneratedThumbnail('${base}_600.png'),
-      '$base.jpg',
-    );
-  });
+  test(
+    'fullSizeFallbackForGeneratedThumbnail strips _150/_300/_600 png suffix',
+    () {
+      const base = 'https://cdn.example.com/media/2026/06/photo-id';
+      expect(
+        fullSizeFallbackForGeneratedThumbnail('${base}_150.png'),
+        '$base.jpg',
+      );
+      expect(
+        fullSizeFallbackForGeneratedThumbnail('${base}_300.png'),
+        '$base.jpg',
+      );
+      expect(
+        fullSizeFallbackForGeneratedThumbnail('${base}_600.png'),
+        '$base.jpg',
+      );
+    },
+  );
 
-  test('fullSizeFallbackForGeneratedThumbnail returns null for non-thumbnail urls', () {
-    expect(
-      fullSizeFallbackForGeneratedThumbnail(
-        'https://cdn.example.com/media/photo.jpg',
-      ),
-      isNull,
-    );
-    expect(fullSizeFallbackForGeneratedThumbnail(''), isNull);
-  });
+  test(
+    'fullSizeFallbackForGeneratedThumbnail returns null for non-thumbnail urls',
+    () {
+      expect(
+        fullSizeFallbackForGeneratedThumbnail(
+          'https://cdn.example.com/media/photo.jpg',
+        ),
+        isNull,
+      );
+      expect(fullSizeFallbackForGeneratedThumbnail(''), isNull);
+    },
+  );
 }

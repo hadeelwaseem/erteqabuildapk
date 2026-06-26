@@ -17,7 +17,6 @@ import 'package:sooq_merchant/features/commerce/checkout/data/datasources/checko
 import 'package:sooq_merchant/features/commerce/checkout/data/models/checkout_draft.dart';
 import 'package:sooq_merchant/features/commerce/checkout/presentation/manager/checkout_cubit/checkout_cubit.dart';
 import 'package:sooq_merchant/features/commerce/data/models/cart.dart';
-import 'package:sooq_merchant/features/commerce/data/models/cart_line.dart';
 import 'package:sooq_merchant/features/commerce/data/models/shipping_address.dart';
 
 class _MemoryCartRepo implements CartRepo {

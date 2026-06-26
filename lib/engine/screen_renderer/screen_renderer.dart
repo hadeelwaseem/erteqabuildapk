@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../core/enums/generic_component_type.dart';
 import '../../config/component_config.dart';
 import '../../config/screen_config.dart';
-import '../../core/utils/app_logger.dart';
 import '../tree/renderers/button_renderer.dart';
 import '../tree/renderers/contact_button_renderer.dart';
 import '../tree/renderers/card_renderer.dart';
