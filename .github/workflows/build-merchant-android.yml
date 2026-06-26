@@ -17,28 +17,39 @@ jobs:
 
       - name: Validate dispatch payload and create merchant manifest
         env:
-          DISPATCH_PAYLOAD: ${{ toJson(github.event.client_payload) }}
+          # دعم الطريقتين: إما أن تأتي البيانات داخل app_data أو مباشرة في client_payload
+          DISPATCH_PAYLOAD: ${{ github.event.client_payload.app_data || toJson(github.event.client_payload) }}
         run: |
-          echo "$DISPATCH_PAYLOAD" > dispatch-payload.json
+          echo "$DISPATCH_PAYLOAD" | jq '.' > dispatch-payload.json
+          
           dart run tool/prepare_merchant_manifest_from_dispatch.dart \
             dispatch-payload.json merchant-build.json
 
       - name: Apply merchant build
         run: |
           dart run tool/apply_merchant_build.dart merchant-build.json
-          echo "TENANT_SLUG=$(jq -r '.tenantSlug' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "APP_NAME=$(jq -r '.appName' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "APP_VERSION=$(jq -r '.version' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "BUILD_NUMBER=$(jq -r '.buildNumber' merchant-build.json)" >> "$GITHUB_ENV"
+          
+          echo "TENANT_SLUG=$(jq -r '.tenant_slug // "merchant"' merchant-build.json)" >> "$GITHUB_ENV"
+          echo "APP_NAME=$(jq -r '.app_name // "App"' merchant-build.json)" >> "$GITHUB_ENV"
 
-      - name: Test
-        continue-on-error: true
-        run: flutter test
+      - name: Decode Android Keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          # فك تشفير ملف التوقيع وحفظه في مجلد أندرويد
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/erteqa-merchant-key.jks
 
       - name: Build APK
+        env:
+          ANDROID_KEYSTORE_PATH: "erteqa-merchant-key.jks"
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
+          VERSION=$(jq -r '.version // "1.0.0"' merchant-build.json)
+          BUILD_NUMBER=$(jq -r '.build_number // "1"' merchant-build.json)
           flutter build apk --release \
-            --build-name="$APP_VERSION" \
+            --build-name="$VERSION" \
             --build-number="$BUILD_NUMBER"
 
       - name: Upload APK to GitHub Artifacts
@@ -68,10 +79,7 @@ jobs:
 
             اسم التطبيق: ${{ env.APP_NAME }}
             المعرّف (Slug): ${{ env.TENANT_SLUG }}
-            رقم البناء: #${{ env.BUILD_NUMBER }}
-            الإصدار: ${{ env.APP_VERSION }}
+            الإصدار: ${{ github.event.client_payload.version || '1.0.0' }}
 
-            رابط تحميل الـ APK:
+            رابط التحميل:
             ${{ env.DOWNLOAD_URL }}
-
-            ملاحظة: للتثبيت الموثوق، حمّلي الـ APK من GitHub Actions Artifacts أولاً.
