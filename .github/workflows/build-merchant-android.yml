@@ -1,5 +1,7 @@
 name: Build merchant Android APK
-
+permissions:
+  contents: write 
+  
 on:
   repository_dispatch:
     types: [build-merchant-app]
