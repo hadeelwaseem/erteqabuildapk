@@ -40,7 +40,6 @@ jobs:
         run: |
           dart run tool/apply_merchant_build.dart merchant-build.json
 
-          # استخراج القيم بشكل آمن
           TENANT_SLUG=$(jq -r '.tenantSlug // "merchant"' merchant-build.json | tr -d '\n' | tr -d ' ')
           APP_NAME=$(jq -r '.appName // "App"' merchant-build.json | tr -d '\n' | tr -d ' ')
           VERSION=$(jq -r '.version // "1.0.0"' merchant-build.json | tr -d '\n' | tr -d ' ')
@@ -51,7 +50,6 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
 
-      # 🔥 Safe Release Tag (100% stable)
       - name: Set Release Tag
         run: |
           if [ -z "$TENANT_SLUG" ]; then TENANT_SLUG="merchant"; fi
@@ -77,18 +75,23 @@ jobs:
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/erteqa-merchant-key.jks
 
-      - name: Build APK
+      # 🚀 FIXED BUILD (IMPORTANT FOR INSTALL ISSUE)
+      - name: Build APK (UNIVERSAL FIXED)
         env:
           ANDROID_KEYSTORE_PATH: "erteqa-merchant-key.jks"
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
+          flutter clean
+          flutter pub get
+
           flutter build apk --release \
+            --no-tree-shake-icons \
+            --target-platform android-arm,android-arm64,android-x64 \
             --build-name="$VERSION" \
             --build-number="$BUILD_NUMBER"
 
-      # 📦 Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -98,7 +101,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 📎 Generate Direct Download URL (GitHub only)
       - name: Generate GitHub Download URL
         run: |
           APK_NAME="app-release.apk"
@@ -108,14 +110,12 @@ jobs:
           echo "DOWNLOAD_URL=$DOWNLOAD_URL" >> "$GITHUB_ENV"
           echo "Generated URL: $DOWNLOAD_URL"
 
-      # 📤 Upload artifact (optional backup)
-      - name: Upload APK to GitHub Artifacts
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TENANT_SLUG }}-android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      # 📲 Telegram Notification
       - name: Send Download Link to Telegram
         uses: appleboy/telegram-action@master
         with:
