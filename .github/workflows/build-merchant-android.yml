@@ -51,16 +51,13 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
 
-      # 🔥 FIXED 100% SAFE TAG
+      # 🔥 Safe Release Tag (100% stable)
       - name: Set Release Tag
         run: |
-          # fallback protection
           if [ -z "$TENANT_SLUG" ]; then TENANT_SLUG="merchant"; fi
           if [ -z "$VERSION" ]; then VERSION="1.0.0"; fi
 
           RELEASE_TAG="${TENANT_SLUG}-v${VERSION}"
-
-          # تنظيف نهائي لأي مشاكل
           RELEASE_TAG=$(echo "$RELEASE_TAG" | tr -d '\n' | tr -d ' ')
 
           echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
@@ -91,6 +88,7 @@ jobs:
             --build-name="$VERSION" \
             --build-number="$BUILD_NUMBER"
 
+      # 📦 Create GitHub Release
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -100,25 +98,24 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # 📎 Generate Direct Download URL (GitHub only)
+      - name: Generate GitHub Download URL
+        run: |
+          APK_NAME="app-release.apk"
+
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}/${APK_NAME}"
+
+          echo "DOWNLOAD_URL=$DOWNLOAD_URL" >> "$GITHUB_ENV"
+          echo "Generated URL: $DOWNLOAD_URL"
+
+      # 📤 Upload artifact (optional backup)
       - name: Upload APK to GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TENANT_SLUG }}-android-apk
           path: build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Upload APK to GoFile
-        run: |
-          RESPONSE=$(curl -sS -F "file=@build/app/outputs/flutter-apk/app-release.apk" https://store1.gofile.io/contents/uploadfile)
-
-          DOWNLOAD_URL=$(echo "$RESPONSE" | jq -r '.data.downloadPage // empty')
-
-          if [ -z "$DOWNLOAD_URL" ] || [ "$DOWNLOAD_URL" = "null" ]; then
-            echo "GoFile upload failed"
-            exit 1
-          fi
-
-          echo "DOWNLOAD_URL=$DOWNLOAD_URL" >> "$GITHUB_ENV"
-
+      # 📲 Telegram Notification
       - name: Send Download Link to Telegram
         uses: appleboy/telegram-action@master
         with:
@@ -136,5 +133,5 @@ jobs:
             📦 Version:
             ${{ env.VERSION }}
 
-            🔗 رابط التحميل:
+            🔗 رابط التحميل المباشر:
             ${{ env.DOWNLOAD_URL }}
