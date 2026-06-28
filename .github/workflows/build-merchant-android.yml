@@ -1,7 +1,8 @@
 name: Build merchant Android APK
+
 permissions:
-  contents: write 
-  
+  contents: write
+
 on:
   repository_dispatch:
     types: [build-merchant-app]
@@ -20,7 +21,6 @@ jobs:
 
       - name: Validate dispatch payload and create merchant manifest
         env:
-          # يدعم إرسال البيانات مباشرة أو داخل app_data
           DISPATCH_PAYLOAD: ${{ github.event.client_payload.app_data || toJson(github.event.client_payload) }}
         run: |
           echo "$DISPATCH_PAYLOAD" | jq '.' > dispatch-payload.json
@@ -70,6 +70,16 @@ jobs:
           flutter build apk --release \
             --build-name="$VERSION" \
             --build-number="$BUILD_NUMBER"
+
+      # ✅ NEW STEP: GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0-temp
+          name: Merchant APK Build
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload APK to GitHub Artifacts
         uses: actions/upload-artifact@v4
