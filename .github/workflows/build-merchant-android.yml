@@ -41,10 +41,15 @@ jobs:
         run: |
           dart run tool/apply_merchant_build.dart merchant-build.json
 
-          echo "TENANT_SLUG=$(jq -r '.tenantSlug // "merchant"' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "APP_NAME=$(jq -r '.appName // "App"' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "VERSION=$(jq -r '.version // "1.0.0"' merchant-build.json)" >> "$GITHUB_ENV"
+          echo "TENANT_SLUG=$(jq -r '.tenantSlug // \"merchant\"' merchant-build.json)" >> "$GITHUB_ENV"
+          echo "APP_NAME=$(jq -r '.appName // \"App\"' merchant-build.json)" >> "$GITHUB_ENV"
+          echo "VERSION=$(jq -r '.version // \"1.0.0\"' merchant-build.json)" >> "$GITHUB_ENV"
           echo "BUILD_NUMBER=$(jq -r '.buildNumber // 1' merchant-build.json)" >> "$GITHUB_ENV"
+
+      # ✅ NEW: Create dynamic release tag
+      - name: Set Release Tag
+        run: |
+          echo "RELEASE_TAG=${TENANT_SLUG}-v${VERSION}" >> "$GITHUB_ENV"
 
       - name: Verify Android configuration
         run: |
@@ -71,12 +76,12 @@ jobs:
             --build-name="$VERSION" \
             --build-number="$BUILD_NUMBER"
 
-      # ✅ NEW STEP: GitHub Release
+      # ✅ GitHub Release (FINAL FIXED VERSION)
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0-temp
-          name: Merchant APK Build
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Merchant APK Build - ${{ env.APP_NAME }}
           files: build/app/outputs/flutter-apk/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
