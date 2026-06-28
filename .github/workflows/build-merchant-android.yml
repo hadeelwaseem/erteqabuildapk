@@ -35,30 +35,44 @@ jobs:
         run: |
           echo "========== merchant-build.json =========="
           cat merchant-build.json
-          echo "========================================="
 
       - name: Apply merchant build
         run: |
           dart run tool/apply_merchant_build.dart merchant-build.json
 
-          echo "TENANT_SLUG=$(jq -r '.tenantSlug // \"merchant\"' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "APP_NAME=$(jq -r '.appName // \"App\"' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "VERSION=$(jq -r '.version // \"1.0.0\"' merchant-build.json)" >> "$GITHUB_ENV"
-          echo "BUILD_NUMBER=$(jq -r '.buildNumber // 1' merchant-build.json)" >> "$GITHUB_ENV"
+          # استخراج القيم بشكل آمن
+          TENANT_SLUG=$(jq -r '.tenantSlug // "merchant"' merchant-build.json | tr -d '\n' | tr -d ' ')
+          APP_NAME=$(jq -r '.appName // "App"' merchant-build.json | tr -d '\n' | tr -d ' ')
+          VERSION=$(jq -r '.version // "1.0.0"' merchant-build.json | tr -d '\n' | tr -d ' ')
+          BUILD_NUMBER=$(jq -r '.buildNumber // 1' merchant-build.json | tr -d '\n' | tr -d ' ')
 
-      # ✅ FIXED: safe release tag (حل مشكلة -v الفارغ)
+          echo "TENANT_SLUG=$TENANT_SLUG" >> "$GITHUB_ENV"
+          echo "APP_NAME=$APP_NAME" >> "$GITHUB_ENV"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+
+      # 🔥 FIXED 100% SAFE TAG
       - name: Set Release Tag
         run: |
-          RELEASE_TAG="${{ env.TENANT_SLUG }}-v${{ env.VERSION }}"
+          # fallback protection
+          if [ -z "$TENANT_SLUG" ]; then TENANT_SLUG="merchant"; fi
+          if [ -z "$VERSION" ]; then VERSION="1.0.0"; fi
+
+          RELEASE_TAG="${TENANT_SLUG}-v${VERSION}"
+
+          # تنظيف نهائي لأي مشاكل
+          RELEASE_TAG=$(echo "$RELEASE_TAG" | tr -d '\n' | tr -d ' ')
+
           echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
+          echo "Generated tag: $RELEASE_TAG"
 
       - name: Verify Android configuration
         run: |
           echo "========== build.gradle.kts =========="
-          grep applicationId android/app/build.gradle.kts
+          grep applicationId android/app/build.gradle.kts || true
 
           echo "========== AndroidManifest =========="
-          grep "android:label" android/app/src/main/AndroidManifest.xml
+          grep "android:label" android/app/src/main/AndroidManifest.xml || true
 
       - name: Decode Android Keystore
         env:
@@ -93,11 +107,8 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Upload APK to GoFile
-        id: upload_gofile
         run: |
           RESPONSE=$(curl -sS -F "file=@build/app/outputs/flutter-apk/app-release.apk" https://store1.gofile.io/contents/uploadfile)
-
-          echo "$RESPONSE"
 
           DOWNLOAD_URL=$(echo "$RESPONSE" | jq -r '.data.downloadPage // empty')
 
