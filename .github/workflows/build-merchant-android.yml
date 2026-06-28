@@ -46,10 +46,11 @@ jobs:
           echo "VERSION=$(jq -r '.version // \"1.0.0\"' merchant-build.json)" >> "$GITHUB_ENV"
           echo "BUILD_NUMBER=$(jq -r '.buildNumber // 1' merchant-build.json)" >> "$GITHUB_ENV"
 
-      # ✅ NEW: Create dynamic release tag
+      # ✅ FIXED: safe release tag (حل مشكلة -v الفارغ)
       - name: Set Release Tag
         run: |
-          echo "RELEASE_TAG=${TENANT_SLUG}-v${VERSION}" >> "$GITHUB_ENV"
+          RELEASE_TAG="${{ env.TENANT_SLUG }}-v${{ env.VERSION }}"
+          echo "RELEASE_TAG=$RELEASE_TAG" >> "$GITHUB_ENV"
 
       - name: Verify Android configuration
         run: |
@@ -76,7 +77,6 @@ jobs:
             --build-name="$VERSION" \
             --build-number="$BUILD_NUMBER"
 
-      # ✅ GitHub Release (FINAL FIXED VERSION)
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
